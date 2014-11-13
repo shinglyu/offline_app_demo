@@ -1,4 +1,3 @@
-var lastupdate = ''
 function updatePage(data){
   function updateField(id){ document.getElementById(id).innerHTML= data[id];
   }
@@ -31,6 +30,7 @@ function downloadUbikeStatus(callback){
 */
 
 function downloadUbikeStatus(callback){
+  changeLoadingVisibility(true);
   console.log("downloading...")
   var url = 'http://opendata.dot.taipei.gov.tw/opendata/gwjs_cityhall.json'
   var onSuccess = function(){
@@ -39,9 +39,8 @@ function downloadUbikeStatus(callback){
     firstEntry = request.response.retVal[0]
     callback(firstEntry)
     localforage.setItem('data', firstEntry, function(){})
+    changeLoadingVisibility(false);
     //lastupdate = (new Date()).toLocaleString();
-    lastupdate = parseTime(firstEntry).toLocaleString();
-    localforage.setItem('lastupdate', lastupdate, function(){})
   }
   
   var request = new XMLHttpRequest({ mozSystem: true });
@@ -55,12 +54,10 @@ function downloadUbikeStatus(callback){
 function main(){
   //var timerId = setInterval(downloadUbikeStatus(updatePage), intv)
   //Try load from local db first
-  localforage.getItem('lastupdate', function(localLastUpdate){ 
-      lastupdate = localLastUpdate;
-  })
   localforage.getItem('data', function(data){ 
       console.log('load from db')
       updatePage(data); 
+      changeLoadingVisibility(false);
   })
   //Try download latest status immediately
   downloadUbikeStatus(updatePage)
@@ -76,6 +73,15 @@ function parseTime(data){
   return new Date(t.substr(0,4), t.substr(4, 2)-1, t.substr(6, 2), 
                   t.substr(8, 2), t.substr(10, 2), t.substr(12, 2));
                   
+}
+
+function changeLoadingVisibility(isVisiable){
+  if(isVisiable){
+    document.getElementById('loadingImg').className ='';
+  }
+  else{
+    document.getElementById('loadingImg').className ='hidden';
+  }
 }
 
 window.onload = main
