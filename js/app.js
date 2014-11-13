@@ -3,10 +3,10 @@ function updatePage(data){
   function updateField(id){ document.getElementById(id).innerHTML= data[id];
   }
   updateField('sna');
-  updateField('ar');
+  //updateField('ar');
   updateField('sbi');
   updateField('bemp');
-  document.getElementById('lastupdate').innerHTML = lastupdate;
+  document.getElementById('lastupdate').innerHTML = parseTime(data).toLocaleString();
 
 }
 /*
@@ -39,7 +39,8 @@ function downloadUbikeStatus(callback){
     firstEntry = request.response.retVal[0]
     callback(firstEntry)
     localforage.setItem('data', firstEntry, function(){})
-    lastupdate = (new Date()).toLocaleString();
+    //lastupdate = (new Date()).toLocaleString();
+    lastupdate = parseTime(firstEntry).toLocaleString();
     localforage.setItem('lastupdate', lastupdate, function(){})
   }
   
@@ -68,6 +69,13 @@ function main(){
   //var intv = 1 * 60 * 1000;
   var timerId = setInterval(function(){downloadUbikeStatus(updatePage);}, intv);
   console.log("TimerId: " + timerId);
+}
+function parseTime(data){
+  var t = data['mday'];
+                 
+  return new Date(t.substr(0,4), t.substr(4, 2)-1, t.substr(6, 2), 
+                  t.substr(8, 2), t.substr(10, 2), t.substr(12, 2));
+                  
 }
 
 window.onload = main
