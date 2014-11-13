@@ -1,3 +1,22 @@
 .hidden {
   display: none;
 }
+
+.glow {
+  box-shadow: inset 0 0 30vw #00FF00;
+  transition: all 0.5s linear;
+}
+
+#glower {
+  margin: 0;
+  padding: 8px;
+  width:95vw;
+  height:97vh;
+  transition: all 1s linear;
+}
+
+body {
+  margin: 0;
+  background-color: #004400;
+  color: lightgrey;
+}
