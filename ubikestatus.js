@@ -1,22 +1,26 @@
+var lastupdate = ''
 function updatePage(data){
-  function updateField(id){
-    document.getElementById(id).innerHTML= data[id];
+  function updateField(id){ document.getElementById(id).innerHTML= data[id];
   }
   updateField('sna');
   updateField('ar');
   updateField('sbi');
   updateField('bemp');
-  var time = new Date();
-  document.getElementById('lastupdate').innerHTML= time.toLocaleString();
+  document.getElementById('lastupdate').innerHTML = lastupdate;
 
 }
+/*
 function downloadUbikeStatus(callback){
   console.log("downloading...")
   var url = 'http://opendata.dot.taipei.gov.tw/opendata/gwjs_cityhall.json'
   var onSuccess = function(data){
     //console.log(JSON.parse(data));
     //console.log(data.retVal);
-    callback(data.retVal[0])
+    firstEntry = data.retVal[0]
+    callback(firstEntry)
+    localforage.setItem('data', firstEntry, function(){})
+    lastupdate = (new Date()).toLocaleString();
+    localforage.setItem('lastupdate', lastupdate, function(){})
   }
   $.ajax({
     dataType: "jsonp",
@@ -24,12 +28,46 @@ function downloadUbikeStatus(callback){
     success: onSuccess
   });
 }
+*/
 
+function downloadUbikeStatus(callback){
+  console.log("downloading...")
+  var url = 'http://opendata.dot.taipei.gov.tw/opendata/gwjs_cityhall.json'
+  var onSuccess = function(){
+    //console.log(JSON.parse(data));
+    console.log(request)
+    firstEntry = request.response.retVal[0]
+    callback(firstEntry)
+    localforage.setItem('data', firstEntry, function(){})
+    lastupdate = (new Date()).toLocaleString();
+    localforage.setItem('lastupdate', lastupdate, function(){})
+  }
+  
+  var request = new XMLHttpRequest({ mozSystem: true });
+  //request = new XMLHttpRequest();
+  request.open('get', url, true);
+  request.responseType = 'json';
+  request.addEventListener('error', function(){alert(request.error)});
+  request.addEventListener('load', onSuccess);
+  request.send();
+}
 function main(){
-  var intv = 1 * 60 * 1000;
   //var timerId = setInterval(downloadUbikeStatus(updatePage), intv)
+  //Try load from local db first
+  localforage.getItem('lastupdate', function(localLastUpdate){ 
+      lastupdate = localLastUpdate;
+  })
+  localforage.getItem('data', function(data){ 
+      console.log('load from db')
+      updatePage(data); 
+  })
+  //Try download latest status immediately
   downloadUbikeStatus(updatePage)
-  var timerId = setInterval(function(){downloadUbikeStatus(updatePage);}, intv)
+  //Try download latest status every intv ms
+  var intv = 0.1 * 60 * 1000;
+  //var intv = 1 * 60 * 1000;
+  var timerId = setInterval(function(){downloadUbikeStatus(updatePage);}, intv);
+  console.log("TimerId: " + timerId);
 }
 
 window.onload = main

@@ -1,0 +1,20 @@
+{
+  "name": "Offline App Demo",
+  "version":"0.1",
+  "description": "YouBike availibility status; Works offline.",
+  "launch_path": "/index.html",
+  "icons": {
+    "128": "/icons/icon128x128.png"
+  },
+  "developer": {
+    "name": "Shing Lyu",
+    "url": "http://shinglyu.github.io"
+  },
+  "type": "privileged",
+  "permissions": {
+    "systemXHR": {
+      "description": "Allow downloading YouBike status"
+    }
+  },
+  "default_locale": "en"
+}
